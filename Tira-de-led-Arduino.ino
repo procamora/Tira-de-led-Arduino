@@ -5,6 +5,8 @@
    @date 14/12/2016
 */
 
+//Info: http://www.prometec.net/tira-de-leds/
+
 //inicio contador en 1 para que en la primera pulsacion entre en el rojo
 int contador = 1;
 
