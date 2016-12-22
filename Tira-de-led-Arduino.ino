@@ -7,22 +7,28 @@
 
 //Info: http://www.prometec.net/tira-de-leds/
 
+#define DEBUG true
+
+#define LED_R 3      //ROJO
+#define LED_G 4      //VERDE
+#define LED_B 5      //AZUL
+#define BUTTON 6     //Conexion del boton
+
 //inicio contador en 1 para que en la primera pulsacion entre en el rojo
 int contador = 1;
-
-const int LED_B = D3;      //AZUL
-const int LED_R = D6;      //ROJO
-const int LED_G = D9;      //VERDE
-const int BUTTON = D2;     //Conexion del boton
 boolean lastButton = LOW;   //contiene el estado anterioR del boton
 boolean currentButton = LOW;  //Contiene el estado actual del boton
 
 void setup() {
-  pinMode (LED_B, OUTPUT);
   pinMode (LED_R, OUTPUT);
   pinMode (LED_G, OUTPUT);
-  pinMode (BUTTON, INPUT);
-  Serial.begin(115200);
+  pinMode (LED_B, OUTPUT);
+  pinMode(BUTTON, INPUT_PULLUP);   // Para leel el boton
+  pinMode(13, OUTPUT);         // Para usar un LED de encendido
+  if (DEBUG) {
+    Serial.begin(115200);
+    Serial.println("inicio");
+  }
 }
 
 
@@ -44,47 +50,55 @@ boolean debounce(boolean last) {
 void loop() {
   currentButton = debounce(lastButton);       //read debounced state
   if (lastButton == LOW && currentButton == HIGH) {  //if it was pressed?
+    if (DEBUG)
+      Serial.println("CONTADOR: " + String(contador));
+    //delay(500);
+
     switch (contador) {
       case 0:
-        Serial.println("APAGAR");
+        if (DEBUG)
+          Serial.println("APAGAR");
         contador++;
-        digitalWrite(LED_B, LOW);
         digitalWrite(LED_R, LOW);
         digitalWrite(LED_G, LOW);
+        digitalWrite(LED_B, LOW);
         break;
 
       case 1: //ROJO
-        Serial.println("rojo 0");
+        if (DEBUG)
+          Serial.println("rojo");
         contador++;
-        digitalWrite(LED_B, LOW);
         digitalWrite(LED_R, HIGH);
         digitalWrite(LED_G, LOW);
+        digitalWrite(LED_B, LOW);
         break;
 
       case 2: //VERDE
-        Serial.println("azul 1");
+        if (DEBUG)
+          Serial.println("verde");
         contador++;
-        digitalWrite(LED_B, LOW);
         digitalWrite(LED_R, LOW);
         digitalWrite(LED_G, HIGH);
+        digitalWrite(LED_B, LOW);
         break;
 
       case 3: //AZUL
-        Serial.println("verde 2");
+        if (DEBUG)
+          Serial.println("azul");
         contador = 0;
-        digitalWrite(LED_B, HIGH);
         digitalWrite(LED_R, LOW);
         digitalWrite(LED_G, LOW);
+        digitalWrite(LED_B, HIGH);
         break;
 
       default:  //nunca debria llegar aqui
         contador = 0;
-        Serial.println("HAY ALGUN FALLO CON EL CONTADOR");
-        Serial.println(contador);
+        if (DEBUG) {
+          Serial.println("HAY ALGUN FALLO CON EL CONTADOR");
+          Serial.println(contador);
+        }
         break;
     }
-    Serial.println(contador);
-    //delay(500);
   }
 
   lastButton = currentButton;
