@@ -5,11 +5,8 @@ El transistor TIP 120, regula el flujo de corriente a su través de 12V y por la
 
 Fuente: [0][prometec]
 
-### Diseño en placa de pruebas
-![](esquema_bb.png)
+### Diseño en placa
+![](esquema.png)
 
-### Diseño en placa compacta
-
-![](esquema_compacto_bb.png)
 
 [prometec]: http://www.prometec.net/tira-de-leds/
