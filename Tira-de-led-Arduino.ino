@@ -4,32 +4,13 @@
    @author Pablo Rocamora pablojoserocamora@gmail.com
    @date 14/12/2016
 */
-
-//Info: http://www.prometec.net/tira-de-leds/
-
-#define DEBUG true
-
-#define LED_R 2      //ROJO
-#define LED_G 3      //VERDE
-#define LED_B 4      //AZUL
-
-#define INPUT_D 6     //APAGAR
-#define INPUT_A 7     //ROJO
-#define INPUT_B 8     //VERDE
-#define INPUT_C 9     //AZUL
-
-#define LECTURA 5     //
-
-//inicio contador en 1 para que en la primera pulsacion entre en el rojo
-boolean currentButton = false;  //Contiene el estado actual del boton
-
-unsigned long TIEMPO_ACTUAL = 0; //last time messages' scan has been done
-#define TIEMPO_ESPERA 100 // mean time between scan messages
+#include "Tira-de-led-Arduino.h"
 
 void setup() {
   pinMode(LED_R, OUTPUT);
   pinMode(LED_G, OUTPUT);
   pinMode(LED_B, OUTPUT);
+
   pinMode(INPUT_A, INPUT);
   pinMode(INPUT_B, INPUT);   // Para leel el boton
   pinMode(INPUT_C, INPUT);
@@ -37,7 +18,7 @@ void setup() {
   pinMode(LECTURA, INPUT);
 
   if (DEBUG) {
-    Serial.begin(115200);
+    Serial.begin(9600);
     Serial.println("inicio");
   }
 }
@@ -48,34 +29,27 @@ String checkBoolean(bool valor) {
   return "False";
 }
 
+void processPin(int pin, int led, String info) {
+  if (digitalRead(pin)) {
+    bool estado = digitalRead(led);
+    if (DEBUG)
+      Serial.println(info + ": " + checkBoolean(!estado));
+    digitalWrite(led, !estado);
+  }
+}
+
 void loop() {
   if (millis() > TIEMPO_ACTUAL + TIEMPO_ESPERA) {
     TIEMPO_ACTUAL = millis();
 
-    if (digitalRead(LECTURA)) {    // Si hay dato valido
-      //if (DEBUG)
-      // Serial.println("currentButton: " + checkBoolean(currentButton));
+    bool current_rx[4];
+    if (remote_controller.getCurrentValue(current_rx)) {   // Si hay dato valido
+      if (DEBUG)
+        Serial.println("currentButton: " + checkBoolean(currentButton));
 
-      if (digitalRead(INPUT_A)) {
-        bool estado = digitalRead(LED_R);
-        if (DEBUG)
-          Serial.println("rojo: " + checkBoolean(!estado));
-        digitalWrite(LED_R, !estado);
-      }
-
-      if (digitalRead(INPUT_B)) {
-        bool estado = digitalRead(LED_G);
-        if (DEBUG)
-          Serial.println("verde: " + checkBoolean(!estado));
-        digitalWrite(LED_G,  !estado);
-      }
-
-      if (digitalRead(INPUT_C)) {
-        bool estado = digitalRead(LED_B);
-        if (DEBUG)
-          Serial.println("azul: " + checkBoolean(!estado));
-        digitalWrite(LED_B,  !estado);
-      }
+      processPin(INPUT_A, LED_R, "rojo");
+      processPin(INPUT_B, LED_G, "verde");
+      processPin(INPUT_C, LED_B, "azul");
 
       if (digitalRead(INPUT_D)) {
         if (DEBUG)
@@ -94,8 +68,8 @@ void loop() {
         Serial.println();
         Serial.println();
       }
-      delay(300);
     }
+    delay(500);
   }
 }
 
